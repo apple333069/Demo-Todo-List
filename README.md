@@ -1,5 +1,19 @@
-# Vue 3 + Vite
+# Demo Todo List
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+簡介
+---
+這是一個使用 Vue 3 + Vite 建立的簡單 Todo List 範例專案，作為快速展示與開發範本。專案使用的主要技術如下：
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+- Vue 3
+- Vite
+- Tailwind / Sass（專案內包含樣式設定）
+
+專案結構（重點檔案）
+---
+- [index.html](index.html)
+- [package.json](package.json)
+- [src/App.vue](src/App.vue)
+- [src/main.js](src/main.js)
+- [src/components/Editor.vue](src/components/Editor.vue)
+- [src/components/Sidebar.vue](src/components/Sidebar.vue)
+
