@@ -21,6 +21,47 @@ const emitField = (field, value) => {
   emit('update', { ...local.value })
 }
 
+// 時間格式轉換
+const isoFromStored = (s) => {
+  if(!s) return ''
+  return s.replace(/\//g, '-')
+}
+const storedFromIso = (iso) => {
+  if(!iso) return ''
+  return iso.replace(/-/g, '/')
+}
+
+const startError = ref('')
+const endError = ref('')
+
+// 驗證日期格式防呆
+const validateDates = () => {
+  startError.value = ''
+  endError.value = ''
+  const s = local.value.startDate
+  const e = local.value.endDate
+  if(s && !/^\d{4}\/\d{2}\/\d{2}$/.test(s)) {
+    startError.value = '請輸入有效日期，格式 YYYY/MM/DD'
+  }
+  if(e && !/^\d{4}\/\d{2}\/\d{2}$/.test(e)) {
+    endError.value = '請輸入有效日期，格式 YYYY/MM/DD'
+  }
+  if(!startError.value && !endError.value && s && e) {
+    const sd = new Date(s.replace(/\//g, '-'))
+    const ed = new Date(e.replace(/\//g, '-'))
+    if(sd.toString() === 'Invalid Date' || ed.toString() === 'Invalid Date') {
+      if(sd.toString() === 'Invalid Date') startError.value = '無效日期'
+      if(ed.toString() === 'Invalid Date') endError.value = '無效日期'
+    } else if(sd > ed) {
+      startError.value = '開始日期不能晚於結束日期'
+    }
+  }
+}
+
+// 當使用者改動 startDate / endDate 時自動驗證
+watch(()=>local.value.startDate, validateDates)
+watch(()=>local.value.endDate, validateDates)
+
 // 綁定，用於上傳圖片
 const fileInput = ref(null)
 // file input 的點擊事件
@@ -69,9 +110,13 @@ const placeholderImage = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/
         <div class="flex flex-col gap-2 flex-[2]">
           <label class="font-regular text-black">Date</label>
           <div class="flex items-center gap-2 w-full">
-            <input class="w-full px-4 py-3 rounded-[10px] border-none bg-muted outline-none text-center font-medium text-black" type="text" :value="local.startDate" @input="e=>emitField('startDate', e.target.value)" placeholder="YYYY/MM/DD" />
+            <input class="w-full px-4 py-3 rounded-[10px] border-none bg-muted outline-none text-center font-medium text-black" type="date" :value="isoFromStored(local.startDate)" @input="e=>{ emitField('startDate', storedFromIso(e.target.value)); validateDates() }" />
             <span class="text-black font-medium">~</span>
-            <input class="w-full px-4 py-3 rounded-[10px] border-none bg-muted outline-none text-center font-medium text-black" type="text" :value="local.endDate" @input="e=>emitField('endDate', e.target.value)" placeholder="YYYY/MM/DD" />
+            <input class="w-full px-4 py-3 rounded-[10px] border-none bg-muted outline-none text-center font-medium text-black" type="date" :value="isoFromStored(local.endDate)" @input="e=>{ emitField('endDate', storedFromIso(e.target.value)); validateDates() }" />
+          </div>
+          <div class="flex gap-4 mt-2">
+            <div class="text-sm text-red-600" v-if="startError">{{ startError }}</div>
+            <div class="text-sm text-red-600" v-if="endError">{{ endError }}</div>
           </div>
         </div>
       </div>
